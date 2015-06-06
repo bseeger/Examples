@@ -1,9 +1,10 @@
 #/bin/python
 # 
-# written by Bethany Seeger <bseeger.cs.umass.edu>
-# April 29th, 2015
+# written by Bethany Seeger <bethany@seeger.ws>
+# June 6th, 2015
 #
 # python script that will a CSV file and tally up certain fields. 
+# Produces a new CSV file with the prefix "LGF_Tally_"
 #
 # 
 
@@ -32,23 +33,11 @@ OTHER = Category(27, 28, 'OTHER') #note that we skipped 26 here!
 
 
 def usage():
-        print "LES_FitCalculator -f <CSV file>"
+        print "python LeverettGetFit.py -f <CSV file>"
         print "  -f        :  file to do calculations on"
         print "  -h        :  usage message"
 
-#
-#    fileobj = open(directory + tmpfile, 'w')
-#                print(pstotext + " " + filename + " > " + filename_pstotext);
-#
-#            fileobj.write(os.path.abspath(filename_pstotext) + " -> " + os.path.abspath(filename) + ".meta.xml\n");
-#            num_files += 1
-#    fileobj.close()
-#    while (fileobj.closed != True) :
-#        print("File obj not closed yet");
-#    return num_files
-#
-#    os.chdir(origdir);
-#
+
 
 def main(argv):
 
@@ -77,7 +66,7 @@ def main(argv):
 
     print ("Running calculations on file '" + csvfile + "'")
     origfile = open(csvfile, 'r')
-    newfilename = "./New" + csvfile
+    newfilename = "./LGF_Tally_" + csvfile
     newfile = open(newfilename, 'w')
     
     datadict = {}
@@ -95,7 +84,7 @@ def main(argv):
         # note that this might be a staff person's name - the script could get fancy
         # here and look at the column name. 
         studentName = data[4]
-
+    
         if studentName not in datadict:
             print("creating entry for " + studentName)
             datadict[studentName] = {
@@ -115,7 +104,6 @@ def main(argv):
 
         # can really trim this down to where datadict[studentName]['Total'] is all we need and add on all the mile info to just one number
         # for now leave this as it will help with debugging. 
-
 
         datadict[studentName][WALKING.index] += float(data[WALKING.mileval]) * (float(data[WALKING.minutes]) / MINUTES_PER_MILE)
         datadict[studentName][BIKING.index] += float(data[BIKING.mileval]) * (float(data[BIKING.minutes]) / MINUTES_PER_MILE)
@@ -142,18 +130,21 @@ def main(argv):
         datadict[studentName]['total'] += float(data[PE.mileval]) * (float(data[PE.minutes]) / MINUTES_PER_MILE)
         datadict[studentName]['total'] += float(data[OTHER.mileval]) * (float(data[OTHER.minutes]) / MINUTES_PER_MILE)
 
-        
     
         line = origfile.readline().strip('\n'); 
     
-    # phew, done with that. ;) Now write the new file 
 
+    # phew, done with that. ;) 
+
+    # round it out, now... should this be ceil? 
     for studentName in datadict: 
         datadict[studentName]['total'] = round(datadict[studentName]['total'])
 
+    # Now write the new file 
+
     newfile.write('"student","total miles"\n')
 
-    # sort doesn't do what i think it does
+    # sort doesn't do what I think it does
     students = datadict.keys()
 
     for student in students:
@@ -163,21 +154,6 @@ def main(argv):
     newfile.close()
     origfile.close()
      
-
-
-#
-#    fileobj = open(directory + tmpfile, 'w')
-#                print(pstotext + " " + filename + " > " + filename_pstotext);
-#
-#            fileobj.write(os.path.abspath(filename_pstotext) + " -> " + os.path.abspath(filename) + ".meta.xml\n");
-#            num_files += 1
-#    fileobj.close()
-#    while (fileobj.closed != True) :
-#        print("File obj not closed yet");
-#    return num_files
-#
-#    os.chdir(origdir);
-#
 
     print ("Finished running calculations.  Created file: " + newfilename + "'");
 
