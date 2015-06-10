@@ -1,4 +1,4 @@
-#/bin/python
+#!/usr/bin/python
 # 
 # written by Bethany Seeger <bethany@seeger.ws>
 # June 6th, 2015
@@ -84,10 +84,14 @@ def main(argv):
         # note that this might be a staff person's name - the script could get fancy
         # here and look at the column name. 
         studentName = data[4]
-    
+        splitname = map(lambda x: x.strip(' '), studentName.split(';'))
+        print "studentName: " + studentName
+        print  splitname
         if studentName not in datadict:
             print("creating entry for " + studentName)
             datadict[studentName] = {
+                'first':splitname[1],
+                'last':splitname[0],
                 WALKING.index:0.0,
                 BIKING.index:0.0,
                 TEAM.index:0.0,
@@ -105,17 +109,17 @@ def main(argv):
         # can really trim this down to where datadict[studentName]['Total'] is all we need and add on all the mile info to just one number
         # for now leave this as it will help with debugging. 
 
-        datadict[studentName][WALKING.index] += float(data[WALKING.mileval]) * (float(data[WALKING.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][BIKING.index] += float(data[BIKING.mileval]) * (float(data[BIKING.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][TEAM.index] += float(data[TEAM.mileval]) * (float(data[TEAM.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][PLAYGROUND.index] += float(data[PLAYGROUND.mileval]) * (float(data[PLAYGROUND.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][INDOOR.index] += float(data[INDOOR.mileval]) * (float(data[INDOOR.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][OUTDOOR.index] += float(data[OUTDOOR.mileval]) * (float(data[OUTDOOR.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][WATER.index] += float(data[WATER.mileval]) * (float(data[WATER.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][WINTER.index] += float(data[WINTER.mileval]) * (float(data[WINTER.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][CHORE.index] += float(data[CHORE.mileval]) * (float(data[CHORE.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][PE.index] += float(data[PE.mileval]) * (float(data[PE.minutes]) / MINUTES_PER_MILE)
-        datadict[studentName][OTHER.index] += float(data[OTHER.mileval]) * (float(data[OTHER.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][WALKING.index] += float(data[WALKING.mileval]) * (float(data[WALKING.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][BIKING.index] += float(data[BIKING.mileval]) * (float(data[BIKING.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][TEAM.index] += float(data[TEAM.mileval]) * (float(data[TEAM.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][PLAYGROUND.index] += float(data[PLAYGROUND.mileval]) * (float(data[PLAYGROUND.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][INDOOR.index] += float(data[INDOOR.mileval]) * (float(data[INDOOR.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][OUTDOOR.index] += float(data[OUTDOOR.mileval]) * (float(data[OUTDOOR.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][WATER.index] += float(data[WATER.mileval]) * (float(data[WATER.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][WINTER.index] += float(data[WINTER.mileval]) * (float(data[WINTER.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][CHORE.index] += float(data[CHORE.mileval]) * (float(data[CHORE.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][PE.index] += float(data[PE.mileval]) * (float(data[PE.minutes]) / MINUTES_PER_MILE)
+        #datadict[studentName][OTHER.index] += float(data[OTHER.mileval]) * (float(data[OTHER.minutes]) / MINUTES_PER_MILE)
 
         #duplicate here -- keep this one ultimately once things check out okay. 
         datadict[studentName]['total'] += float(data[WALKING.mileval]) * (float(data[WALKING.minutes]) / MINUTES_PER_MILE)
@@ -140,23 +144,23 @@ def main(argv):
     for studentName in datadict: 
         datadict[studentName]['total'] = round(datadict[studentName]['total'])
 
-    # Now write the new file 
-
+    # Now write the new file ------------------------
     newfile.write('"student","total miles"\n')
 
-    # sort doesn't do what I think it does
-    students = datadict.keys()
+    # sort by the funky key (lastname; firstname)
+    students = sorted(datadict.keys())
 
     for student in students:
-        newfile.write('"' + student + '","' + str(datadict[student]['total']) + '"\n');
+        # print using the split out first name and last name. 
+        newfile.write('"' + datadict[student]['first'] + " " + datadict[student]['last'] + '":"' + str(datadict[student]['total']) + ' miles"\n');
 
-    # voila, new file created. Now close it. 
+    # done writing file ------------------------------
+
+    # Now close the new file
     newfile.close()
     origfile.close()
      
-
     print ("Finished running calculations.  Created file: " + newfilename + "'");
-
 
 if __name__ == "__main__":
     main(sys.argv[1:])
